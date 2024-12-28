@@ -32,12 +32,21 @@ public class TwoSum {
         int[] result = twoSum(nums, target);
         System.out.println(Arrays.toString(result));
     }
+//    private static int[] twoSum(int[] nums, int target) {
+//        for (int i = 0; i < nums.length; i++) {
+//            for (int j = i + 1; j < nums.length; j++) {
+//                if (target == nums[i] + nums[j]) {
+//                    return new int[]{i, j};
+//                }
+//            }
+//        }
+//        throw new IllegalArgumentException("No two sum solution");
+//    }
+
     private static int[] twoSum(int[] nums, int target) {
-        for (int i = 0; i < nums.length; i++) {
-            for (int j = i + 1; j < nums.length; j++) {
-                if (target == nums[i] + nums[j]) {
-                    return new int[]{i, j};
-                }
+        for (int i = 0; i < nums.length - 1; i++) {
+            if (target == nums[i] + nums[i + 1]) {
+                return new int[]{i, i + 1};
             }
         }
         throw new IllegalArgumentException("No two sum solution");
