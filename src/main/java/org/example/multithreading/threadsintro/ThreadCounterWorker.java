@@ -1,7 +1,5 @@
 package org.example.multithreading.threadsintro;
 
-
-
 public class ThreadCounterWorker extends Thread {
 
     private final String name;

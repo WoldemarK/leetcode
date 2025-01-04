@@ -1,7 +1,7 @@
 package org.example.multithreading.threadsintro.demoMain;
 
 import lombok.SneakyThrows;
-import org.example.threadsintro.ThreadCounterWorker;
+import org.example.multithreading.threadsintro.ThreadCounterWorker;
 
 public class ThreadCounterDemo {
     @SneakyThrows

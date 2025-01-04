@@ -1,7 +1,7 @@
 package org.example.multithreading.synchronization.demoMain;
 
-import org.example.synchronization.Eater;
-import org.example.synchronization.Spoon;
+import org.example.multithreading.synchronization.Eater;
+import org.example.multithreading.synchronization.Spoon;
 
 public class LiveLockDemo {
     public static void main(String[] args) {

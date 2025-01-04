@@ -1,7 +1,7 @@
 package org.example.multithreading.collections.demoMain;
 
-import org.example.collections.ReadFromCHMWorker;
-import org.example.collections.WriteToCHMWorker;
+import org.example.multithreading.collections.ReadFromCHMWorker;
+import org.example.multithreading.collections.WriteToCHMWorker;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;

@@ -1,6 +1,6 @@
 package org.example.multithreading.synchronization.demoMain;
 
-import org.example.synchronization.SyncThread;
+import org.example.multithreading.synchronization.SyncThread;
 
 public class DeadlockDemo {
     public static void main(String[] args) {

@@ -1,7 +1,7 @@
 package org.example.multithreading.synchronization.demoMain;
 
-import org.example.synchronization.PingWorker;
-import org.example.synchronization.PongWorker;
+import org.example.multithreading.synchronization.PingWorker;
+import org.example.multithreading.synchronization.PongWorker;
 
 import java.util.concurrent.Exchanger;
 import java.util.concurrent.atomic.AtomicInteger;

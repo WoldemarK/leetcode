@@ -1,6 +1,6 @@
 package org.example.multithreading.synchronization.demoMain;
 
-import org.example.synchronization.FooSemaphoreSafe;
+import org.example.multithreading.synchronization.FooSemaphoreSafe;
 
 public class FooSemaphoreSafeDemo {
     public static void main(String[] args) {

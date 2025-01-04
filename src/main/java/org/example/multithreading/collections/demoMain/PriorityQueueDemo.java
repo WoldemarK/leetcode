@@ -1,7 +1,7 @@
 package org.example.multithreading.collections.demoMain;
 
-import org.example.collections.ReadFromPriorityQueueWorker;
-import org.example.collections.WriteToPriorityQueueWorker;
+import org.example.multithreading.collections.ReadFromPriorityQueueWorker;
+import org.example.multithreading.collections.WriteToPriorityQueueWorker;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;

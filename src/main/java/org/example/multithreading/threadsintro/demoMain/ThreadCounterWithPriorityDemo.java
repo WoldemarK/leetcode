@@ -1,6 +1,6 @@
 package org.example.multithreading.threadsintro.demoMain;
 
-import org.example.threadsintro.ThreadCounterWithPriorityWorker;
+import org.example.multithreading.threadsintro.ThreadCounterWithPriorityWorker;
 
 public class ThreadCounterWithPriorityDemo {
     public static void main(String[] args) {

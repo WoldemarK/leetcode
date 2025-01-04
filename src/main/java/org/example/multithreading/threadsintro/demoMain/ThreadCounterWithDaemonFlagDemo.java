@@ -1,6 +1,6 @@
 package org.example.multithreading.threadsintro.demoMain;
 
-import org.example.threadsintro.ThreadCounterWithDaemonFlagWorker;
+import org.example.multithreading.threadsintro.ThreadCounterWithDaemonFlagWorker;
 
 public class ThreadCounterWithDaemonFlagDemo {
     public static void main(String[] args) {

@@ -1,6 +1,6 @@
 package org.example.multithreading.synchronization.demoMain;
 
-import org.example.synchronization.FooUnsafe;
+import org.example.multithreading.synchronization.FooUnsafe;
 
 public class FooUnsafeDemo {
     public static void main(String[] args) {

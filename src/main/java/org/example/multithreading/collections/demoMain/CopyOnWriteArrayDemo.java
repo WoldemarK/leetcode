@@ -1,7 +1,7 @@
 package org.example.multithreading.collections.demoMain;
 
-import org.example.collections.ReadFromCOWArrayWorker;
-import org.example.collections.WriteToCOWArrayWorker;
+import org.example.multithreading.collections.ReadFromCOWArrayWorker;
+import org.example.multithreading.collections.WriteToCOWArrayWorker;
 
 import java.util.Arrays;
 import java.util.List;

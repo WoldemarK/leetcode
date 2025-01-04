@@ -1,7 +1,7 @@
 package org.example.multithreading.collections.demoMain;
 
-import org.example.collections.ReadFromQueueWorker;
-import org.example.collections.WriteToQueueWorker;
+import org.example.multithreading.collections.ReadFromQueueWorker;
+import org.example.multithreading.collections.WriteToQueueWorker;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;

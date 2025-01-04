@@ -1,6 +1,6 @@
 package org.example.multithreading.executors.demoMain;
 
-import org.example.executors.GenerateRandomIntegerWithIdTask;
+import org.example.multithreading.executors.GenerateRandomIntegerWithIdTask;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;

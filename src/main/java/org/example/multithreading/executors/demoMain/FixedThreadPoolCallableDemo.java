@@ -1,6 +1,6 @@
 package org.example.multithreading.executors.demoMain;
 
-import org.example.executors.GenerateRandomIntegerCallableTask;
+import org.example.multithreading.executors.GenerateRandomIntegerCallableTask;
 
 import java.util.ArrayList;
 import java.util.List;

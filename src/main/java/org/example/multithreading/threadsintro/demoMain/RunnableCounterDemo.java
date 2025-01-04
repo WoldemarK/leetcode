@@ -1,7 +1,7 @@
 package org.example.multithreading.threadsintro.demoMain;
 
 import lombok.SneakyThrows;
-import org.example.threadsintro.RunnableCounterWorker;
+import org.example.multithreading.threadsintro.RunnableCounterWorker;
 
 public class RunnableCounterDemo {
 

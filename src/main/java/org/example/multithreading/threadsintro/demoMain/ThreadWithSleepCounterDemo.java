@@ -1,6 +1,6 @@
 package org.example.multithreading.threadsintro.demoMain;
 
-import org.example.threadsintro.ThreadWithSleepCounterWorker;
+import org.example.multithreading.threadsintro.ThreadWithSleepCounterWorker;
 
 public class ThreadWithSleepCounterDemo {
     public static void main(String[] args) {
