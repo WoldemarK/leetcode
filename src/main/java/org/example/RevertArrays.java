@@ -6,7 +6,7 @@ import java.util.Arrays;
 public class RevertArrays {
     public static void main(String[] args) {
         int[] my_array1 = {
-                1789, 2035, 1899, 1456, 2013};
+                1789, 2035, 1899, 1456, 2013, 54464};
         System.out.println(MessageFormat.format("До преобразования {0}", Arrays.toString(my_array1)));
         int[] result = revert(my_array1);
         System.out.println(MessageFormat.format("После преобразования {0}", Arrays.toString(result)));

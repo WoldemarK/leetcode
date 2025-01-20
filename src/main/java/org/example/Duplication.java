@@ -1,7 +1,9 @@
 package org.example;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class Duplication {
     public static void main(String[] args) {
@@ -15,6 +17,7 @@ public class Duplication {
             System.out.println("Дубликат отсутствует");
         }
     }
+
 
     public static Integer findFirstDuplicate(int[] array) {
         Set<Integer> set = new HashSet<>();
