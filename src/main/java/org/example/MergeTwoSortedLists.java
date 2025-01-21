@@ -20,18 +20,18 @@ public class MergeTwoSortedLists {
         Stream<ListNode> stream1 = toStream(list1);
         Stream<ListNode> stream2 = toStream(list2);
 
-        ListNode dummy = new ListNode();
+        ListNode result = new ListNode();
 
-        final ListNode[] curr = {dummy};
+        final ListNode[] temp = {result};
 
         Stream.concat(stream1, stream2)
                 .sorted(Comparator.comparingInt(a -> a.val))
                 .forEach(node -> {
-                    curr[0].next = node;
-                    curr[0] = curr[0].next;
+                    temp[0].next = node;
+                    temp[0] = temp[0].next;
                 });
 
-        return dummy.next;
+        return result.next;
     }
     private static Stream<ListNode> toStream(ListNode head) {
         List<ListNode> list = new ArrayList<>();
