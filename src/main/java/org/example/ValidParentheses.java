@@ -13,10 +13,10 @@ public class ValidParentheses {
     public static void main(String[] args) {
         String row = "'(', ')', '{', '}', '[', ']'";
 
-        System.out.println(isValid(row));
+        System.out.println(isValidV2(row));
     }
 
-    public static boolean isValid(String s) {
+    public static boolean isValidV1(String s) {
         Stack<Character> stack = new Stack<>();
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
@@ -39,5 +39,19 @@ public class ValidParentheses {
             }
         }
         return stack.isEmpty();
+    }
+
+    public static boolean isValidV2(String s) {
+        return s.chars()
+                .mapToObj(c -> (char) c)
+                .reduce(new Stack<Character>(), (stack, c) -> {
+                    if (c == '(' || c == '{' || c == '[') {
+                        stack.push(c);
+                    } else if (c == ')' || c == '}' || c == ']') {
+                        stack.pop();
+                    }
+                    return stack;
+                }, (stack1, stack2) -> stack1)
+                .isEmpty();
     }
 }
