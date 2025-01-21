@@ -1,7 +1,5 @@
 package org.example;
 
-import java.util.stream.IntStream;
-
 /**
  * Вам дан массив prices с ценами prices[i] на акции в день ith
  * Вы хотите максимизировать свою прибыль, выбрав один день для покупки акций и другой день в будущем для их продажи.
@@ -28,18 +26,15 @@ public class MaxProfit {
         System.out.println(maxProfit(prices2));
     }
     public static int maxProfit(int[] prices) {
-        if (prices == null || prices.length < 2) {
-            return 0;
+        int minPrice = Integer.MAX_VALUE;
+        int maxProfit = 0;
+        for (int price : prices) {
+            if (price < minPrice) {
+                minPrice = price;
+            } else if (price - minPrice > maxProfit) {
+                maxProfit = price - minPrice;
+            }
         }
-        int[] result = IntStream.range(0, prices.length)
-                .mapToObj(i -> new int[]{prices[i], 0})
-                .reduce(new int[]{Integer.MAX_VALUE, 0}, (acc, priceInfo) -> {
-
-                    acc[0] = Math.min(acc[0], priceInfo[0]);
-                    acc[1] = Math.max(acc[1], priceInfo[0] - acc[0]);
-                    return acc;
-                });
-
-        return result[1];
+        return maxProfit;
     }
 }
