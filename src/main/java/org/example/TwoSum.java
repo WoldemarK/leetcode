@@ -1,6 +1,7 @@
 package org.example;
 
 import java.util.Arrays;
+import java.util.stream.IntStream;
 
 /**
  * Даны массив целых чисел и целое число , возвращают индексы двух чисел так, что их сумма равна целевому значению.numstarget
@@ -29,26 +30,25 @@ public class TwoSum {
     public static void main(String[] args) {
         int[] nums = {2, 7, 11, 15};
         int target = 9;
-        int[] result = twoSum(nums, target);
+        int[] result = twoSumV1(nums, target);
         System.out.println(Arrays.toString(result));
     }
-//    private static int[] twoSum(int[] nums, int target) {
-//        for (int i = 0; i < nums.length; i++) {
-//            for (int j = i + 1; j < nums.length; j++) {
-//                if (target == nums[i] + nums[j]) {
-//                    return new int[]{i, j};
-//                }
-//            }
-//        }
-//        throw new IllegalArgumentException("No two sum solution");
-//    }
 
-    private static int[] twoSum(int[] nums, int target) {
+
+    private static int[] twoSumV1(int[] nums, int target) {
         for (int i = 0; i < nums.length - 1; i++) {
             if (target == nums[i] + nums[i + 1]) {
                 return new int[]{i, i + 1};
             }
         }
         throw new IllegalArgumentException("No two sum solution");
+    }
+
+    private static int[] twoSumV2(int[] nums, int target) {
+        return IntStream.range(0, nums.length - 1)
+                .filter(i -> target == nums[i] + nums[i + 1])
+                .mapToObj(i -> new int[]{i, i + 1})
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("No two sum solution"));
     }
 }
