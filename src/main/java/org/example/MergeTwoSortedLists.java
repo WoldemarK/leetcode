@@ -1,6 +1,7 @@
 package org.example;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -24,7 +25,7 @@ public class MergeTwoSortedLists {
         final ListNode[] curr = {dummy};
 
         Stream.concat(stream1, stream2)
-                .sorted((a, b) -> Integer.compare(a.val, b.val))
+                .sorted(Comparator.comparingInt(a -> a.val))
                 .forEach(node -> {
                     curr[0].next = node;
                     curr[0] = curr[0].next;
