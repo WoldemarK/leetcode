@@ -11,7 +11,7 @@ import java.util.Stack;
  */
 public class ValidParentheses {
     public static void main(String[] args) {
-        String row = "'(', ')', '{', '}', '[', ']'";
+        String row = "([])";
 
         System.out.println(isValidV2(row));
     }
@@ -47,8 +47,14 @@ public class ValidParentheses {
                 .reduce(new Stack<Character>(), (stack, c) -> {
                     if (c == '(' || c == '{' || c == '[') {
                         stack.push(c);
-                    } else if (c == ')' || c == '}' || c == ']') {
+                    } else if (c == ')' && stack.peek() == '(') {
                         stack.pop();
+                    } else if (c == '}' && stack.peek() == '{') {
+                        stack.pop();
+                    } else if (c == ']' && stack.peek() == '[') {
+                        stack.pop();
+                    } else {
+                        stack.push(c);
                     }
                     return stack;
                 }, (stack1, stack2) -> stack1)
