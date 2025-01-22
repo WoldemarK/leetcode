@@ -27,5 +27,4 @@ public class PalindromeChecker {
         }
         return true;
     }
-
 }
