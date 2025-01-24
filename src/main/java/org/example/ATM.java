@@ -47,37 +47,63 @@ public class ATM {
 
     }
 
-    /**
-     * @param amount сума снятия
-     * @return True если все OK, если что-то пошло не так, то False
-     */
+    //    /**
+//     * @param amount сума снятия
+//     * @return True если все OK, если что-то пошло не так, то False
+//     */
+//    public boolean withdrawCash(int amount) {
+//        if (amount <= 0 || amount % 100 != 0) {
+//            System.out.println("Ошибка: Некорректная сумма для снятия.");
+//            return false;
+//        }
+//        Map<Integer, Integer> cashToDispense = new HashMap<>();
+//        int remainingAmount = amount; // нужно снять 12_500
+//
+//        // Сортировка номиналов по убыванию для оптимального снятия
+//        for (Integer nominals : cashCassettes.keySet().stream().sorted(Comparator.reverseOrder()).toList()) {
+//
+//            int countAvailable = cashCassettes.get(nominals); // key(nominal) 5000 value-количество 5 = 25_000
+//            int countNeeded = remainingAmount / nominals; // 12_5000/ 5_000=2
+//            if (countNeeded > 0) {                        // 2>0 yes
+//                int countToDispense = Math.min(countNeeded, countAvailable); //  2<== (2, 10_000) == 2
+//                cashToDispense.put(nominals, countToDispense);  // Kys (nominals)=5000 Value (countToDispense) =2
+//                 remainingAmount -= countToDispense * nominals; // 10_000 -= 2 * 5000
+//            }
+//        }
+//        if (remainingAmount > 0) {
+//            System.out.println("Ошибка: Невозможно выдать запрошенную сумму.");
+//            return false;
+//        }
+//        // Снятие наличных из кассет
+//        cashToDispense.forEach((nominals, count) -> {
+//            cashCassettes.put(nominals, cashCassettes.get(nominals) - count);
+//            System.out.printf("Выдано: %d банкнот номиналом %d%n", count, nominals);
+//        });
+//        System.out.printf("Сумма %d выдана успешно.%n", amount);
+//        return true;
+//    }
     public boolean withdrawCash(int amount) {
         if (amount <= 0 || amount % 100 != 0) {
             System.out.println("Ошибка: Некорректная сумма для снятия.");
             return false;
         }
         Map<Integer, Integer> cashToDispense = new HashMap<>();
-        int remainingAmount = amount; // нужно снять 12_500
-
-        // Сортировка номиналов по убыванию для оптимального снятия
-        for (Integer nominals : cashCassettes.keySet()
-                .stream()
-                .sorted(Comparator.reverseOrder())
-                .toList()) {
-
-            int countAvailable = cashCassettes.get(nominals); // key(nominal) 5000 value-количество 5 = 25_000
-            int countNeeded = remainingAmount / nominals; // 12_5000/ 5_000=2
-            if (countNeeded > 0) {                        // 2>0 yes
-                int countToDispense = Math.min(countNeeded, countAvailable); //  2<== (2, 10_000) == 2
-                cashToDispense.put(nominals, countToDispense);  // Kys (nominals)=5000 Value (countToDispense) =2
-                 remainingAmount -= countToDispense * nominals; // 10_000 -= 2 * 5000
+        int tem = amount;
+        for (Integer nominals : cashCassettes.keySet().stream().sorted(Comparator.reverseOrder()).toList()) {
+            int key = nominals;
+            int value = cashCassettes.get(key);
+            int countNeeded = key / nominals;
+            if (countNeeded > 0) {
+                int countToDispense = Math.min(countNeeded, value);
+                cashToDispense.put(key, countToDispense);
+                tem -= countToDispense * key;
             }
         }
-        if (remainingAmount > 0) {
+        if (tem > 0) {
             System.out.println("Ошибка: Невозможно выдать запрошенную сумму.");
             return false;
         }
-        // Снятие наличных из кассет
+        //Снятие наличных из кассет
         cashToDispense.forEach((nominals, count) -> {
             cashCassettes.put(nominals, cashCassettes.get(nominals) - count);
             System.out.printf("Выдано: %d банкнот номиналом %d%n", count, nominals);
@@ -91,14 +117,14 @@ public class ATM {
         // Тест 1: Загрузка и отображение банкнот
         atm.loadCash(100, 0);
         atm.loadCash(500, 1);
-        atm.loadCash(1000, 10);
-        atm.loadCash(5000, 2);
+        atm.loadCash(1000, 2);
+        atm.loadCash(5000, 1);
         atm.displayCassettes();
 
         // Тест 2: Успешное снятие наличных
-//        System.out.println("Тест 2: Успешное снятие 7600");
-//        atm.withdrawCash(7600);
-//        atm.displayCassettes();
+        //      System.out.println("Тест 2: Успешное снятие 7600");
+        atm.withdrawCash(7600);
+        atm.displayCassettes();
 
         // Тест 3: Попытка снять недоступную сумму
 //        System.out.println("Тест 3: Попытка снять 12500 (ожидается ошибка)");
@@ -113,6 +139,7 @@ public class ATM {
 //        System.out.println("Тест 5: Загрузка с неверным номиналом 200");
 //        atm.loadCash(200, 10);
     }
+
     public static void main(String[] args) {
         runTests();
 
