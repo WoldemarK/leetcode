@@ -1,31 +1,39 @@
 package org.example;
 
+import java.util.stream.IntStream;
+
 public class BinarySearch {
     public static void main(String[] args) {
-        int[] array = {89, 57, 91, 47, 95, 3, 27, 22, 67, 99};
-        int target = 47;
+        int[] nums = {-1, 0, 3, 5, 9, 12};
+        int target = 9;
 
-        int result = binarySearch(array, target);
+        int result = binarySearch2(nums, target);
         System.out.println(result);
 
 
     }
 
     public static int binarySearch(int[] nums, int target) {
-        int firstIndex = 0;                          // 0                                             || 6
-        int lastIndex = nums.length;                 // 10                                            || 10
-        //                                               ||
-        while (firstIndex <= lastIndex) {            // 0 < == 10          Yes                        || 6 < = 10  Yes
-            int mid = (firstIndex + lastIndex) / 2;  // mid = 0+10=10, 10/2 =5;     index 5 = 3       || 6 + 10 = 16, 16 \ 2 =8; index 8 = 67
-            if (nums[mid] == target) {               //3 == 47 No                                     ||
-                return mid;                          //         -----                                 || -------
-            } else if (nums[mid] < target)           //3 element < = 47                               ||
-                firstIndex = mid + 1;                //firstIndex = mid + 1; first(0)->(6)= mid(5)+1=6||
-            else if (nums[mid] > target)             //                                               ||
-                lastIndex = mid - 1;                 //                                               ||
+        int firstIndex = 0;
+        int lastIndex = nums.length - 1;
+        while (firstIndex <= lastIndex) {
+            int mid = (firstIndex + lastIndex) / 2;
+            if (nums[mid] == target) {
+                return mid;
+            } else if (nums[mid] < target)
+                firstIndex = mid + 1;
+            else if (nums[mid] > target)
+                lastIndex = mid - 1;
 
         }
         return -1;
+    }
+
+    public static int binarySearch2(int[] nums, int target) {
+        return IntStream.range(0, nums.length)
+                .filter(element -> nums[element] == target)
+                .findFirst()
+                .orElse(-1);
     }
 
 }
