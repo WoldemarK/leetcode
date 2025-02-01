@@ -42,7 +42,7 @@ public class ATM {
     public void displayCassettes() {
         System.out.println("Состояние кассет банкомата:");
         cashCassettes.forEach((nominals, count) -> {
-            System.out.println("Номинал: " + nominals + " руб., Количество: " + count);
+            System.out.printf("Номинал: %d руб., Количество: %d%n", nominals, count);
         });
 
     }
@@ -91,8 +91,8 @@ public class ATM {
         int tem = amount;
         for (Integer nominals : cashCassettes.keySet().stream().sorted(Comparator.reverseOrder()).toList()) {
             int key = nominals;
-            int value = cashCassettes.get(key);
-            int countNeeded = key / nominals;
+            int value = cashCassettes.getOrDefault(key, -129);
+            int countNeeded = tem / key;
             if (countNeeded > 0) {
                 int countToDispense = Math.min(countNeeded, value);
                 cashToDispense.put(key, countToDispense);
