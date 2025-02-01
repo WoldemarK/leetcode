@@ -40,12 +40,12 @@ public class TwoSum {
     public static int[] twoSumV3(int[] nums, int target) {
         HashMap<Integer, Integer> prevMap = new HashMap<>();
         for (int i = 0; i < nums.length; i++) {
-            int num = nums[i];                          //2         !!! 7
-            int diff = target - num;                   // 9 - 2 = 7 !!! 9-7=2
-            if (prevMap.containsKey(diff)) {           // ----      !!! +
-                return new int[]{prevMap.get(diff), i};// ----      !!! diff = 2 i = 7
+            int num = nums[i];
+            int diff = target - num;
+            if (prevMap.containsKey(diff)) {
+                return new int[]{prevMap.get(diff), i};
             }
-            prevMap.put(num, i);                         //2|0
+            prevMap.put(num, i);
         }
         return new int[]{};
     }
@@ -57,5 +57,13 @@ public class TwoSum {
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("No two sum solution"));
     }
+
+    private static int twoSumV5(int[] nums, int target) {
+        return IntStream.range(0, nums.length - 1)
+                .filter(i -> target == nums[i])
+                .findFirst()
+                .orElse(-1);
+    }
+    
 }
 
