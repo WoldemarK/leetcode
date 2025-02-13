@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 
 public class Duplication {
     public static void main(String[] args) {
-        int[] array = {1, 2, 33, 2};
+        int[] array = {1, 2, 33, 2,2 };
 
         Integer firstDuplicate = findFirstDuplicate(array);
 

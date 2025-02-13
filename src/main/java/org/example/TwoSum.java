@@ -29,12 +29,18 @@ public class TwoSum {
 
 
     private static int[] twoSumV1(int[] nums, int target) {
-        for (int i = 0; i < nums.length - 1; i++) {
-            if (target == nums[i] + nums[i + 1]) {
-                return new int[]{i, i + 1};
+//        for (int i = 0; i < nums.length - 1; i++) {
+//            if (target == nums[i] + nums[i + 1]) {
+//                return new int[]{i, i + 1};
+//            }
+//        }
+//        throw new IllegalArgumentException("No two sum solution");
+        for (int i: nums) {
+            if (i == target) {
+                return new int[] {i, i};
             }
         }
-        throw new IllegalArgumentException("No two sum solution");
+        return null;
     }
 
     public static int[] twoSumV3(int[] nums, int target) {
