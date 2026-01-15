@@ -26,11 +26,10 @@ public class MainMuitiMap {
                 .stream()
                 .flatMap(entry -> {
                     Integer key = entry.getKey();
-                    List<Long> values = entry.getValue();
-                    return values.stream()
+                    return entry.getValue()
+                            .stream()
                             .map(num -> Map.entry(num, key));
                 }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-
         System.out.println(outputMap);
     }
 }
