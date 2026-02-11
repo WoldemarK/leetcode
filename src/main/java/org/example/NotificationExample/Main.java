@@ -100,7 +100,7 @@ class NotificationFilterService {
         // Определяем "последние 24 часа"
         Instant cutoffTime = Instant.now().minus(duplicateWindowHours, ChronoUnit.HOURS);
         //Загружаем уже отправленные письма
-        Set<String> recentDuplicates = exstractRecentDuplicates(recipientIds, cutoffTime);
+        Set<String> recentDuplicates = extractRecentDuplicates(recipientIds, cutoffTime);
         //
         Set<String> batchDuplicates = new HashSet<>();
         //
@@ -124,7 +124,7 @@ class NotificationFilterService {
     }
 
     // Берём старую историю писем
-    private Set<String> exstractRecentDuplicates(Set<String> recipientIds, Instant at) {
+    private Set<String> extractRecentDuplicates(Set<String> recipientIds, Instant at) {
         return historyProvider.getSentNotificationsSince(recipientIds, at)
                 .stream()
                 .map(sent -> sent.recipientId() + "::" + sent.notificationId())
