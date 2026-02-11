@@ -1,144 +1,159 @@
 package org.example.NotificationExample;
 
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 
-import java.time.Clock;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class Main {
     public static void main(String[] args) {
-        // === 1. Создаём реализации сервисов ===
-        UserSettingsService userSettingsService = new UserSettingsServiceImpl();
-        NotificationHistoryService notificationHistoryService = new NotificationHistoryServiceImpl();
 
-        // === 2. Фильтр ===
-        NotificationFilter filter = new NotificationFilter(userSettingsService, notificationHistoryService);
-
-        // === 3. Уведомления для теста ===
-        List<Notification> notifications = List.of(
-                new Notification(1L, NotificationType.EMAIL, "Hello!", 100L),   // дубль → отфильтровано
-                new Notification(2L, NotificationType.SMS, "Hi!", 100L),        // SMS запрещён → отфильтровано
-                new Notification(3L, NotificationType.EMAIL, "Spam?", 100L),    // отправитель 50 заблокирован → отфильтровано
-                new Notification(4L, NotificationType.PUSH, "Welcome!", 200L),  // пройдёт
-                new Notification(5L, NotificationType.EMAIL, "News", 200L)      // пройдёт
+        NotificationFilterService notificationFilterService = new NotificationFilterService(
+                recipientIds -> {
+                    Map<String, UserPreferences> prefs = new HashMap<>();
+                    for (String userId : recipientIds) {
+                        prefs.put(userId, new UserPreferences(
+                                Set.of(NotificationType.SMS, NotificationType.PUSH),
+                                Set.of("4")
+                        ));
+                    }
+                    return prefs;
+                },
+                (recipientIds, since) ->
+                        List.of(new HistorySentNotification("1", "user3", Instant.now())), 24
         );
 
-        // === 4. Фильтрация и вывод ===
-        filter.filter(50L, notifications).forEach(n ->
-                System.out.printf("ID: %d, Тип: %s, Получатель: %d, Текст: %s%n",
-                        n.id(), n.type(), n.recipientId(), n.message())
-        );
+        List<Notification> notifications = List.of
+                (
+                        new Notification("1", NotificationType.EMAIL, "user1", "Welcome to our service!"),
+                        new Notification("2", NotificationType.EMAIL, "user1", "Special offer inside!"),
+                        new Notification("3", NotificationType.SMS, "user1", "Your account updated"),
+                        new Notification("4", NotificationType.SMS, "user2", "Weekly promotion"),
+                        new Notification("5", NotificationType.EMAIL, "user1", "Welcome to our service!"),
+                        new Notification("6", NotificationType.EMAIL, "user3", "Weekly digest"),
+                        new Notification("7", NotificationType.PUSH, "user3", "New message received")
+                );
+
+
+        List<Notification> filtered = notificationFilterService.filter("1", notifications);
+
+
+        filtered.forEach(n -> System.out.printf("  ✓ [%s] to %s via %s: \"%s\"%n",
+                n.notificationId(), n.recipientId(), n.type(), n.messageText()));
+
+        System.out.println("Notifications BLOCKED:");
+        notifications.stream()
+                .filter(n -> !filtered.contains(n))
+                .forEach(n -> System.out.printf("  ✗ [%s] to %s via %s: \"%s\"%n",
+                        n.notificationId(), n.recipientId(), n.type(), n.messageText()));
+    }
+}
+
+interface UserPreferencesProvider {
+    Map<String, UserPreferences> getPreferencesForUsers(Set<String> recipientIds);
+}
+
+interface NotificationHistoryProvider {
+    List<HistorySentNotification> getSentNotificationsSince(Set<String> recipientIds, Instant since);
+}
+
+enum NotificationType {
+    EMAIL, SMS, PUSH
+}
+
+record Notification(String notificationId, NotificationType type, String recipientId, String messageText) {
+}
+
+record UserPreferences(Set<NotificationType> allowedChannels, Set<String> blockedSenders
+) {
+    public boolean isChannelAllowed(NotificationType type) {
+        return allowedChannels.contains(type);
     }
 
-    @RequiredArgsConstructor
-    static class NotificationFilter {
-        private final UserSettingsService userSettingsService;
-        private final NotificationHistoryService notificationHistoryService;
-        private final Clock clock;
+    public boolean isSenderBlocked(String senderId) {
+        return blockedSenders.contains(senderId);
+    }
+}
 
-        public NotificationFilter(UserSettingsService userSettingsService,
-                                  NotificationHistoryService notificationHistoryService) {
-            this(userSettingsService, notificationHistoryService, Clock.systemUTC());
+record HistorySentNotification(String notificationId, String recipientId, Instant sentAt) {
+}
+
+@RequiredArgsConstructor
+class NotificationFilterService {
+    private final UserPreferencesProvider preferencesProvider;
+    private final NotificationHistoryProvider historyProvider;
+    private final long duplicateWindowHours;
+
+    public List<Notification> filter(String senderId, List<Notification> notifications) {
+        Objects.requireNonNull(senderId, "Sender ID must not be null");
+
+        if (notifications == null || notifications.isEmpty()) {
+            return List.of();
         }
 
-        public List<Notification> filter(Long senderId, List<Notification> notifications) {
-            if (notifications == null || notifications.isEmpty()) {
-                return Collections.emptyList();
+        //Собираем всех получателей
+        Set<String> recipientIds = notifications.stream().map(Notification::recipientId).collect(Collectors.toSet());
+        //Загружаем настройки пользователей
+        Map<String, UserPreferences> preferencesMap = preferencesProvider.getPreferencesForUsers(recipientIds);
+        // Определяем "последние 24 часа"
+        Instant cutoffTime = Instant.now().minus(duplicateWindowHours, ChronoUnit.HOURS);
+        //Загружаем уже отправленные письма
+        Set<String> recentDuplicates = exstractRecentDuplicates(recipientIds, cutoffTime);
+        //
+        Set<String> batchDuplicates = new HashSet<>();
+        //
+        List<Notification> result = new ArrayList<>();
+
+        for (Notification notification : notifications) {
+            //Строим ключ письма
+            String key = notification.recipientId() + "::" + notification.notificationId();
+            //Проверяем дубли ВНУТРИ текущего списка
+            if (batchDuplicates.contains(key)) {
+                continue;
             }
-            Set<Long> recipientIds = notifications.stream()
-                    .map(Notification::recipientId)
-                    .collect(Collectors.toSet());
-
-
-            Map<Long, UserPreferences> preferencesMap = userSettingsService.getPreferencesForUsers(recipientIds);
-            Instant cutoff = Instant.now(clock).minus(24, ChronoUnit.HOURS);
-            List<SentNotificationRecord> recentHistory = notificationHistoryService.getSentNotificationsSince(recipientIds, cutoff);
-
-            Set<String> recentlySent = recentHistory.stream()
-                    .map(sent -> sent.recipientId() + "::" + sent.notificationId())
-                    .collect(Collectors.toSet());
-            return notifications.stream()
-                    .filter(notification -> {
-                        Long recipientId = notification.recipientId();
-                        String dedupKey = recipientId + "::" + notification.id();
-
-                        // 1. Проверка дубликатов
-                        if (recentlySent.contains(dedupKey)) {
-                            return false;
-                        }
-
-                        // 2. Получение настроек пользователя (с дефолтом на случай отсутствия)
-                        UserPreferences prefs = preferencesMap.getOrDefault(recipientId, DEFAULT_PREFERENCES);
-
-                        // 3. Проверка разрешённого типа уведомления
-                        if (!prefs.allowedNotificationTypes().contains(notification.type())) {
-                            return false;
-                        }
-
-                        // 4. Проверка заблокированного отправителя
-                        if (prefs.blockedSenders().contains(senderId)) {
-                            return false;
-                        }
-                        return true;
-                    })
-                    .collect(Collectors.toList());
+            //Проверяем можно ли доставить
+            if (shouldDeliver(new FilterNotificationRecord(notification, senderId, preferencesMap, recentDuplicates))) {
+                result.add(notification);
+                batchDuplicates.add(key);
+            }
         }
-        private static final UserPreferences DEFAULT_PREFERENCES = UserPreferences.builder()
-                .allowedNotificationTypes(Set.of(NotificationType.EMAIL, NotificationType.SMS, NotificationType.PUSH))
-                .blockedSenders(Set.of())
-                .build();
+
+        return result;
     }
 
-    @Builder
-    public record UserPreferences(Set<Long> blockedSenders, Set<NotificationType> allowedNotificationTypes) {
+    // Берём старую историю писем
+    private Set<String> exstractRecentDuplicates(Set<String> recipientIds, Instant at) {
+        return historyProvider.getSentNotificationsSince(recipientIds, at)
+                .stream()
+                .map(sent -> sent.recipientId() + "::" + sent.notificationId())
+                .collect(Collectors.toSet());
     }
 
-    public record Notification(Long id, NotificationType type, String message, Long recipientId) {
-    }
-
-    public record SentNotificationRecord(Long notificationId, Long recipientId, Instant sentAt) {
-    }
-
-    public enum NotificationType {
-        EMAIL, SMS, PUSH
-    }
-
-    public interface UserSettingsService {
-        Map<Long, UserPreferences> getPreferencesForUsers(Set<Long> userIds);
-    }
-    @RequiredArgsConstructor
-    public static class UserSettingsServiceImpl implements UserSettingsService {
-
-        @Override
-        public Map<Long, UserPreferences> getPreferencesForUsers(Set<Long> userIds) {
-            final UserPreferences BLOCKED_USER = UserPreferences.builder()
-                    .allowedNotificationTypes(Set.of(NotificationType.EMAIL, NotificationType.PUSH))
-                    .blockedSenders(Set.of(50L))
-                    .build();
-
-             final UserPreferences DEFAULT_USER = UserPreferences.builder()
-                    .allowedNotificationTypes(Set.of(NotificationType.EMAIL, NotificationType.SMS, NotificationType.PUSH))
-                    .blockedSenders(Set.of())
-                    .build();
-
-            return userIds.stream().collect(Collectors.toMap(Function.identity(),
-                    id -> id == 100L ? BLOCKED_USER : DEFAULT_USER));
+    //решение судьбы письма
+    private boolean shouldDeliver(FilterNotificationRecord record) {
+        //Получаем настройки человека
+        UserPreferences preferences =
+                record.preferencesMap().get(record.notification().recipientId());
+        //Проверяем разрешения Письмо можно отправить, если правил нет
+        boolean allowedByPreferences = preferences == null
+                //или канал разрешён И отправитель не заблокирован
+                || (preferences.isChannelAllowed(record.notification().type())
+                && !preferences.isSenderBlocked(record.senderId()));
+        //Если нельзя → сразу отказ Человек не хочет такие письма
+        if (!allowedByPreferences) {
+            return false;
         }
+         //Проверяем историю Не отправляли ли уже такое письмо недавн
+        return !record.recentDuplicates()
+                .contains("%s::%s".formatted(record.notification().recipientId(), record.notification().notificationId()));
     }
+}
 
-    public interface NotificationHistoryService {
-        List<SentNotificationRecord> getSentNotificationsSince(Set<Long> userIds, Instant since);
-    }
-    public static class NotificationHistoryServiceImpl implements NotificationHistoryService{
-        @Override
-        public List<SentNotificationRecord> getSentNotificationsSince(Set<Long> userIds, Instant since) {
-            return List.of(new SentNotificationRecord(1L,100L,
-                    Instant.now().minus(1,ChronoUnit.HOURS)));
-        }
-    }
+record FilterNotificationRecord(Notification notification,
+                                String senderId,
+                                Map<String, UserPreferences> preferencesMap,
+                                Set<String> recentDuplicates) {
+
 }
