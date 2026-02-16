@@ -101,7 +101,6 @@ class NotificationFilterService {
         Instant cutoffTime = Instant.now().minus(duplicateWindowHours, ChronoUnit.HOURS);
         //Загружаем уже отправленные письма
         Set<String> recentDuplicates = extractRecentDuplicates(recipientIds, cutoffTime);
-        //
         Set<String> batchDuplicates = new HashSet<>();
         //
         List<Notification> result = new ArrayList<>();
