@@ -7,7 +7,7 @@ public class RemoveDuplicatesString {
     public static void main(String[] args) {
         int[] array = new int[]{1, 2, 3, 4, 4, 5, 6, 7, 7, 7, 7};
         test1(array);
-        String input = "Привет, Ккот!";
+        String input = "Привет, Кот!";
         String result = test2(input);
         System.out.println(result);
     }
