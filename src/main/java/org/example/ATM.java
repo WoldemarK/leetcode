@@ -7,11 +7,12 @@ import java.awt.*;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 @Setter
 @Getter
 public class ATM {
-
+    private static final Logger log = Logger.getLogger(ATM.class.getName());
     private Map<Integer, Integer> cashCassettes;
 
     public ATM() {
@@ -22,58 +23,82 @@ public class ATM {
         cashCassettes.put(5000, 0);
     }
 
-    /**
-     * @param nominals номинал или Key
-     * @param count    сума на которую будет произведено пополнение
-     */
-    public void loadCash(int nominals, int count) {
-        if (cashCassettes.containsKey(nominals)) {
-            cashCassettes.put(nominals, cashCassettes.get(nominals) + count);
-            System.out.printf("Загружено: %d банкнот номиналом %d%n", count, nominals);
+    private void loadCash(Integer nominal, Integer count) {
+        validateNominalAndCount(nominal, count);
+        if (cashCassettes.containsKey(nominal)) {
+            cashCassettes.put(nominal, count);
+            log.info("Загружено: " + count + " банкнот номиналом " + nominal);
         } else {
-            System.out.printf("Ошибка: Неверный номинал %d%n", nominals);
+            log.warning("Ошибка: Неверный номинал " + nominal);
         }
-
-    }
-
-    /**
-     * Метод для отображения состояния кассет
-     */
-    public void displayCassettes() {
-        System.out.println("Состояние кассет банкомата:");
-        cashCassettes.forEach((nominals, count) ->
-                System.out.printf("Номинал: %d руб., Количество: %d%n", nominals, count));
-
     }
 
     public boolean withdrawCash(int amount) {
-        if (amount <= 0 || amount % 100 != 0) {
-            System.out.println("Ошибка: Некорректная сумма для снятия.");
+        log.info("Запрашиваемая сумма: " + amount);
+
+        if (!validateAmount(amount)) {
             return false;
         }
+
         Map<Integer, Integer> cashToDispense = new HashMap<>();
-        int tem = amount;
-        for (Integer nominals : cashCassettes.keySet().stream().sorted(Comparator.reverseOrder()).toList()) {
-            int key = nominals;
-            int value = cashCassettes.getOrDefault(key, -129);
-            int countNeeded = tem / key;
-            if (countNeeded > 0) {
-                int countToDispense = Math.min(countNeeded, value);
-                cashToDispense.put(key, countToDispense);
-                tem -= countToDispense * key;
-            }
-        }
-        if (tem > 0) {
-            System.out.println("Ошибка: Невозможно выдать запрошенную сумму.");
+        amount = calculateDispense(amount, cashToDispense);
+
+        if (amount > 0) {
+            log.info("Невозможно выдать точную сумму");
             return false;
         }
         //Снятие наличных из кассет
-        cashToDispense.forEach((nominals, count) -> {
-            cashCassettes.put(nominals, cashCassettes.get(nominals) - count);
-            System.out.printf("Выдано: %d банкнот номиналом %d%n", count, nominals);
-        });
-        System.out.printf("Сумма %d выдана успешно.%n", amount);
+        withdrawal(cashToDispense);
+        log.info("Выдача успешна: " + cashToDispense);
         return true;
+    }
+
+    private void withdrawal(Map<Integer, Integer> totals) {
+        totals.forEach((k, v) -> {
+            cashCassettes.put(k, cashCassettes.get(k) - v);
+            System.out.printf("Выдано: %d банкнот номиналом %d%n", v, k);
+        });
+    }
+
+    private int calculateDispense(int amount, Map<Integer, Integer> cashToDispense) {
+        for (Map.Entry<Integer, Integer> entry : cashCassettes.entrySet()
+                .stream()
+                .sorted(Map.Entry.<Integer, Integer>comparingByKey().reversed())
+                .toList()) {
+
+            int countNeeded = amount / entry.getKey();
+
+            if (countNeeded > 0) {
+                int countToDispense = Math.min(countNeeded, entry.getValue());
+                cashToDispense.put(entry.getKey(), countToDispense);
+                amount -= countToDispense * entry.getKey();
+            }
+        }
+        return amount;
+    }
+
+    private static boolean validateAmount(int amount) {
+        if (amount <= 0 || amount % 100 != 0) {
+            log.warning("Некорректная сумма");
+            return false;
+        }
+        return true;
+    }
+
+    private static void validateNominalAndCount(Integer nominal, Integer count) {
+        if (nominal == null || (count == null)) {
+            throw new IllegalArgumentException("nominal и count не должны быть null");
+        }
+        if (count < 0) {
+            throw new IllegalArgumentException("count не может быть отрицательным");
+        }
+    }
+
+
+    public void displayCassettes() {
+        System.out.println("Состояние кассет банкомата:");
+        cashCassettes.forEach(((nominal, count) ->
+                System.out.printf("Номинал: %d руб., Количество: %d%n", nominal, count)));
     }
 
     public static void runTests() {
@@ -87,7 +112,7 @@ public class ATM {
 
         // Тест 2: Успешное снятие наличных
         //      System.out.println("Тест 2: Успешное снятие 7600");
-        atm.withdrawCash(7600);
+        atm.withdrawCash(5300);
         atm.displayCassettes();
 
         // Тест 3: Попытка снять недоступную сумму
