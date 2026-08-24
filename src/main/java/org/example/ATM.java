@@ -41,6 +41,7 @@ public class ATM {
         }
 
         Map<Integer, Integer> cashToDispense = new HashMap<>();
+
         amount = calculateDispense(amount, cashToDispense);
 
         if (amount > 0) {
@@ -49,6 +50,7 @@ public class ATM {
         }
         //Снятие наличных из кассет
         withdrawal(cashToDispense);
+
         log.info("Выдача успешна: " + cashToDispense);
         return true;
     }

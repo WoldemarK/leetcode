@@ -32,6 +32,7 @@ import java.util.Map;
 @Data
 @Builder
 public class Shop {
+
     public Map<Users, Integer> discount;
 
     public Shop(Map<Users, Integer> discount) {
@@ -39,9 +40,9 @@ public class Shop {
     }
 
     public Basket method(Users users, Basket basket) {
-        Integer dis = discount.getOrDefault(users, 0);
+        Integer dis = discount.get(users);
         for (Product product : basket.getProducts()) {
-            product.setTotal((100 - dis) * product.getTotal());
+            product.setTotal((100 - dis) * product.getTotal()/100);
         }
         return basket;
     }
@@ -81,7 +82,7 @@ class Mains{
         Product product1 = new Product(1,2.2,2.);
         Product product2 = new Product(2,3.,2.5);
         Basket basket = new Basket(List.of(product1, product2));
-        Shop shop = new Shop(Map.of(users,1));
+        Shop shop = new Shop(Map.of(users,10));
         System.out.println(shop);
         System.out.println(shop.method(users, basket));
     }}

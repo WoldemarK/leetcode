@@ -18,7 +18,7 @@ import java.util.Arrays;
  */
 public class ValidAnagram {
     public static void main(String[] args) {
-        String s1 = "anagram", t1 = "nagaram";
+        String s1 = "anagram", t1 = "anagram";
         String s2 = "rat", t2 = "car";
 
         System.out.println(isAnagram(s1, t1));  // Результат: true
