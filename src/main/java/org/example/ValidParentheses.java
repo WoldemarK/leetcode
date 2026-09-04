@@ -23,12 +23,12 @@ public class ValidParentheses {
             char ch = str.charAt(i);
 
             // Открывающая скобка
-            if (ch == '(' || ch == '[') {
+            if (ch == '(' || ch == '[' || ch == '{') {
                 stack.push(ch);
             }
 
             // Закрывающая скобка
-            else if (ch == ')' || ch == ']' ) {
+            else if (ch == ')' || ch == ']' || ch == '}') {
 
                 // Нет открывающей скобки
                 if (stack.isEmpty()) {
@@ -46,6 +46,9 @@ public class ValidParentheses {
                     return false;
                 }
 
+                if (ch == '}' && top != '{') {
+                    return false;
+                }
             }
         }
 
