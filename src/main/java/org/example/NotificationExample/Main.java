@@ -22,8 +22,7 @@ public class Main {
                     return prefs;
                 },
                 (recipientIds, since) ->
-                        List.of(new HistorySentNotification("1", "user3", Instant.now())), 24
-        );
+                        List.of(new HistorySentNotification("1", "user3", Instant.now())));
 
         List<Notification> notifications = List.of
                 (
@@ -66,7 +65,9 @@ enum NotificationType {
 record Notification(String notificationId, NotificationType type, String recipientId, String messageText) {
 }
 
-record UserPreferences(Set<NotificationType> allowedChannels, Set<String> blockedSenders
+record UserPreferences(
+        Set<NotificationType> allowedChannels,
+        Set<String> blockedSenders
 ) {
     public boolean isChannelAllowed(NotificationType type) {
         return allowedChannels.contains(type);
@@ -84,7 +85,7 @@ record HistorySentNotification(String notificationId, String recipientId, Instan
 class NotificationFilterService {
     private final UserPreferencesProvider preferencesProvider;
     private final NotificationHistoryProvider historyProvider;
-    private final long duplicateWindowHours;
+
 
     public List<Notification> filter(String senderId, List<Notification> notifications) {
         Objects.requireNonNull(senderId, "Sender ID must not be null");
@@ -98,7 +99,7 @@ class NotificationFilterService {
         //Загружаем настройки пользователей
         Map<String, UserPreferences> preferencesMap = preferencesProvider.getPreferencesForUsers(recipientIds);
         // Определяем "последние 24 часа"
-        Instant cutoffTime = Instant.now().minus(duplicateWindowHours, ChronoUnit.HOURS);
+        Instant cutoffTime = Instant.now().minus(24, ChronoUnit.HOURS);
         //Загружаем уже отправленные письма
         Set<String> recentDuplicates = extractRecentDuplicates(recipientIds, cutoffTime);
         Set<String> batchDuplicates = new HashSet<>();
