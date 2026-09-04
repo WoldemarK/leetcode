@@ -16,28 +16,40 @@ public class ValidParentheses {
         System.out.println(isValidV2(row));
     }
 
-    public static boolean isValidV1(String s) {
+    public static boolean isValidV(String str) {
         Stack<Character> stack = new Stack<>();
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            if (c == '(' || c == '{' || c == '[') {
-                stack.push(c);
-            } else if (c == ')' || c == '}' || c == ']') {
+
+        for (int i = 0; i < str.length(); i++) {
+            char ch = str.charAt(i);
+
+            // Открывающая скобка
+            if (ch == '(' || ch == '[') {
+                stack.push(ch);
+            }
+
+            // Закрывающая скобка
+            else if (ch == ')' || ch == ']' ) {
+
+                // Нет открывающей скобки
                 if (stack.isEmpty()) {
                     return false;
                 }
+
                 char top = stack.pop();
-                if (c == ')' && top != '(') {
+
+                // Проверяем соответствие
+                if (ch == ')' && top != '(') {
                     return false;
                 }
-                if (c == '}' && top != '{') {
+
+                if (ch == ']' && top != '[') {
                     return false;
                 }
-                if (c == ']' && top != '[') {
-                    return false;
-                }
+
             }
         }
+
+        // Если стек пуст — все скобки закрыты правильно
         return stack.isEmpty();
     }
 
